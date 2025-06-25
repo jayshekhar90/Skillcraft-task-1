@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stopwatch App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+  <div class="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center">
+    <h1 class="text-3xl font-bold mb-6">Stopwatch</h1>
+    
+    <div id="display" class="text-5xl font-mono mb-6">00:00:00.000</div>
+
+    <div class="flex justify-center gap-4 mb-6">
+      <button id="startPauseBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Start</button>
+      <button id="resetBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Reset</button>
+      <button id="lapBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Lap</button>
+    </div>
+
+    <div>
+      <h2 class="text-lg font-semibold mb-2">Lap Times</h2>
+      <ul id="laps" class="text-left max-h-48 overflow-y-auto text-sm border rounded p-2 bg-gray-50"></ul>
+    </div>
+  </div>
+
+  <script>
+    let startTime = null;
+    let elapsed = 0;
+    let timerInterval = null;
+    let isRunning = false;
+
+    const display = document.getElementById('display');
+    const startPauseBtn = document.getElementById('startPauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const lapBtn = document.getElementById('lapBtn');
+    const lapsList = document.getElementById('laps');
+
+    function formatTime(ms) {
+      const date = new Date(ms);
+      const h = String(date.getUTCHours()).padStart(2, '0');
+      const m = String(date.getUTCMinutes()).padStart(2, '0');
+      const s = String(date.getUTCSeconds()).padStart(2, '0');
+      const msStr = String(date.getUTCMilliseconds()).padStart(3, '0');
+      return `${h}:${m}:${s}.${msStr}`;
+    }
+
+    function updateDisplay() {
+      const now = Date.now();
+      const diff = now - startTime + elapsed;
+      display.textContent = formatTime(diff);
+    }
+
+    function startStopwatch() {
+      if (!isRunning) {
+        startTime = Date.now();
+        timerInterval = setInterval(updateDisplay, 10);
+        startPauseBtn.textContent = "Pause";
+        isRunning = true;
+      } else {
+        clearInterval(timerInterval);
+        elapsed += Date.now() - startTime;
+        startPauseBtn.textContent = "Start";
+        isRunning = false;
+      }
+    }
+
+    function resetStopwatch() {
+      clearInterval(timerInterval);
+      startTime = null;
+      elapsed = 0;
+      isRunning = false;
+      display.textContent = "00:00:00.000";
+      startPauseBtn.textContent = "Start";
+      lapsList.innerHTML = "";
+    }
+
+    function recordLap() {
+      if (!isRunning) return;
+      const lapTime = Date.now() - startTime + elapsed;
+      const lapItem = document.createElement("li");
+      lapItem.textContent = formatTime(lapTime);
+      lapsList.prepend(lapItem);
+    }
+
+    startPauseBtn.addEventListener("click", startStopwatch);
+    resetBtn.addEventListener("click", resetStopwatch);
+    lapBtn.addEventListener("click", recordLap);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+  <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-xl">
+    <h1 class="text-2xl font-bold mb-4 text-center">Quiz Game</h1>
+    
+    <div id="quiz-container">
+      <!-- Question will appear here -->
+    </div>
+
+    <div class="mt-4 text-center">
+      <button id="submitBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit Answer</button>
+    </div>
+
+    <div id="result" class="mt-6 text-lg font-semibold text-center hidden"></div>
+
+    <div class="mt-4 text-center hidden" id="restartContainer">
+      <button onclick="restartQuiz()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Restart Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        type: "single", // single choice
+        question: "What is the capital of France?",
+        options: ["Berlin", "Paris", "Rome", "Madrid"],
+        correct: "Paris"
+      },
+      {
+        type: "multi", // multiple choice
+        question: "Which of the following are programming languages?",
+        options: ["Python", "HTML", "JavaScript", "Google"],
+        correct: ["Python", "JavaScript"]
+      },
+      {
+        type: "fill", // fill in the blank
+        question: "Fill in the blank: The ___ is the brain of the computer.",
+        correct: "CPU"
+      }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+
+    const quizContainer = document.getElementById("quiz-container");
+    const submitBtn = document.getElementById("submitBtn");
+    const resultDiv = document.getElementById("result");
+    const restartContainer = document.getElementById("restartContainer");
+
+    function loadQuestion() {
+      const q = questions[currentIndex];
+      quizContainer.innerHTML = `
+        <p class="text-lg font-medium mb-4">${q.question}</p>
+        <div id="answerBox">
+          ${q.type === "single" ? q.options.map(opt => `
+            <label class="block mb-2">
+              <input type="radio" name="answer" value="${opt}" class="mr-2">
+              ${opt}
+            </label>
+          `).join("") : ""}
+          
+          ${q.type === "multi" ? q.options.map(opt => `
+            <label class="block mb-2">
+              <input type="checkbox" name="answer" value="${opt}" class="mr-2">
+              ${opt}
+            </label>
+          `).join("") : ""}
+          
+          ${q.type === "fill" ? `
+            <input type="text" id="fillAnswer" class="border border-gray-300 px-2 py-1 w-full rounded" />
+          ` : ""}
+        </div>
+      `;
+    }
+
+    function getUserAnswer() {
+      const q = questions[currentIndex];
+      if (q.type === "single") {
+        const selected = document.querySelector('input[name="answer"]:checked');
+        return selected ? selected.value : null;
+      }
+      if (q.type === "multi") {
+        const selected = [...document.querySelectorAll('input[name="answer"]:checked')];
+        return selected.map(i => i.value);
+      }
+      if (q.type === "fill") {
+        return document.getElementById("fillAnswer").value.trim();
+      }
+    }
+
+    function checkAnswer(userAns) {
+      const q = questions[currentIndex];
+      if (q.type === "single") {
+        return userAns === q.correct;
+      }
+      if (q.type === "multi") {
+        const correctSet = new Set(q.correct);
+        const userSet = new Set(userAns);
+        return q.correct.length === userAns.length && [...correctSet].every(i => userSet.has(i));
+      }
+      if (q.type === "fill") {
+        return userAns.toLowerCase() === q.correct.toLowerCase();
+      }
+    }
+
+    submitBtn.addEventListener("click", () => {
+      const userAns = getUserAnswer();
+      if (userAns === null || userAns.length === 0) {
+        alert("Please provide an answer.");
+        return;
+      }
+
+      if (checkAnswer(userAns)) score++;
+
+      currentIndex++;
+
+      if (currentIndex < questions.length) {
+        loadQuestion();
+      } else {
+        quizContainer.innerHTML = "";
+        submitBtn.style.display = "none";
+        resultDiv.classList.remove("hidden");
+        resultDiv.textContent = `You scored ${score} out of ${questions.length}!`;
+        restartContainer.classList.remove("hidden");
+      }
+    });
+
+    function restartQuiz() {
+      currentIndex = 0;
+      score = 0;
+      resultDiv.classList.add("hidden");
+      restartContainer.classList.add("hidden");
+      submitBtn.style.display = "inline-block";
+      loadQuestion();
+    }
+
+    // Initial load
+    loadQuestion();
+  </script>
+</body>
+</html>
