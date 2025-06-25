@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Navigation Menu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Smooth transition for nav background */
+    .transition-nav {
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+  </style>
+</head>
+<body class="m-0 p-0 font-sans">
+
+  <!-- Navigation Bar -->
+  <nav id="navbar" class="fixed top-0 left-0 w-full z-50 bg-transparent text-white transition-nav">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-xl font-bold">My Website</h1>
+      <ul class="flex gap-6 text-lg">
+        <li><a href="#" class="hover:text-blue-400 hover:underline transition">Home</a></li>
+        <li><a href="#" class="hover:text-blue-400 hover:underline transition">About</a></li>
+        <li><a href="#" class="hover:text-blue-400 hover:underline transition">Services</a></li>
+        <li><a href="#" class="hover:text-blue-400 hover:underline transition">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Content for Scrolling -->
+  <div class="mt-24 px-6 py-12 space-y-12">
+    <section class="h-screen bg-gray-100 rounded-lg p-6 shadow">Scroll down to see effect</section>
+    <section class="h-screen bg-gray-200 rounded-lg p-6 shadow">More content</section>
+    <section class="h-screen bg-gray-300 rounded-lg p-6 shadow">Even more content</section>
+  </div>
+
+  <!-- JavaScript for Scroll Effect -->
+  <script>
+    const navbar = document.getElementById("navbar");
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 10) {
+        navbar.classList.add("bg-white", "shadow", "text-black");
+        navbar.classList.remove("bg-transparent", "text-white");
+      } else {
+        navbar.classList.add("bg-transparent", "text-white");
+        navbar.classList.remove("bg-white", "shadow", "text-black");
+      }
+    });
+  </script>
+
+</body>
+</html>
